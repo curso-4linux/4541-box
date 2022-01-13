@@ -1,0 +1,33 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+VAGRANT_DISABLE_VBOXSYMLINKCREATE=1
+
+vms = {
+  'kube-single-master' => {'memory' => '3072', 'cpus' => 1, 'ip' => '100', 'box' => 'devopsbox/centos-8.5', 'provision' => 'provision/ansible/kube-single-master.yaml'},
+  'kube-single-node1' => {'memory' => '1536', 'cpus' => 1, 'ip' => '101', 'box' => 'devopsbox/centos-8.5','provision' => 'provision/ansible/kube-single-node1.yaml'},
+  'kube-single-node2' => {'memory' => '1536', 'cpus' => 1, 'ip' => '102', 'box' => 'devopsbox/centos-8;5', 'provision' => 'provision/ansible/kube-single-node2.yaml'},
+}
+
+Vagrant.configure('2') do |config|
+
+  config.vm.box_check_update = false
+
+        if !(File.exists?('id_rsa'))
+          system("ssh-keygen -b 2048 -t rsa -f id_rsa -q -N ''")
+       end
+
+  vms.each do |name, conf|
+    config.vm.define "#{name}" do |k|
+      k.vm.box = "#{conf['box']}"
+      k.vm.hostname = "#{name}"
+      k.vm.network 'private_network', ip: "172.16.1.#{conf['ip']}"
+      k.vm.provider 'virtualbox' do |vb|
+        vb.memory = conf['memory']
+        vb.cpus = conf['cpus']
+      end
+      k.vm.provision 'ansible_local' do |ansible|
+        ansible.playbook = "#{conf['provision']}"
+      end
+  end
+end
