@@ -6,7 +6,7 @@ VAGRANT_DISABLE_VBOXSYMLINKCREATE=1
 vms = {
   'kube-single-master' => {'memory' => '3072', 'cpus' => 1, 'ip' => '100', 'box' => 'devopsbox/centos-8.5', 'provision' => 'provision/ansible/kube-single-master.yaml'},
   'kube-single-node1' => {'memory' => '1536', 'cpus' => 1, 'ip' => '101', 'box' => 'devopsbox/centos-8.5','provision' => 'provision/ansible/kube-single-node1.yaml'},
-  'kube-single-node2' => {'memory' => '1536', 'cpus' => 1, 'ip' => '102', 'box' => 'devopsbox/centos-8;5', 'provision' => 'provision/ansible/kube-single-node2.yaml'},
+  'kube-single-node2' => {'memory' => '1536', 'cpus' => 1, 'ip' => '102', 'box' => 'devopsbox/centos-8.5', 'provision' => 'provision/ansible/kube-single-node2.yaml'},
 }
 
 Vagrant.configure('2') do |config|
@@ -28,6 +28,7 @@ Vagrant.configure('2') do |config|
       end
       k.vm.provision 'ansible_local' do |ansible|
         ansible.playbook = "#{conf['provision']}"
+        ansible.compatibility_mode = '2.0'
       end
     end
   end
